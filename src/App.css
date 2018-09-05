@@ -56,17 +56,28 @@ article {
 
 .elements {
 	float:right;
-	padding: 1px 25px 1px 100px;
+	padding: 1px 25px 10px 100px;
 	border: 1px solid #888888;
 	//border-radius: 15px;
-	background-color: #FFFAC6;
+	background-color: #ffffdf;
 	margin: 4px 0;
-	height: auto;
-	width: auto;
+	height: 80px;
+	width: 100%;
 }
 
+.status {
+	float:left;
+	padding: 20px 5px;
+}
 
+.button {
+	float:right;
+	padding: 20px;
+}
 
+.slidecontainer {
+	padding: 60px 0;
+}
 
 /* The switch - the box around the slider */
 .switch {

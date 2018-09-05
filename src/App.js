@@ -3,7 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 import socketIOClient from 'socket.io-client'
 import ReactDOM from 'react-dom';
-import update from 'react-addons-update';
+import Automation from './Automation';
+import Linechart from './Linechart';
 
 class App extends Component {
 	constructor(props) {
@@ -13,12 +14,9 @@ class App extends Component {
 		
 		this.state = {
 			devices: [],
-			isLoggedIn: false,
-			endpoint: "http://194.95.194.122:8086"
+			deviccc: ["Lamp", "Lamp2"],
+			endpoint: "http://194.95.194.122:8086",
 		};
-		
-		//this.handleChange = this.handleChange.bind(this);
-		
 	}
 	
 	componentDidMount() {
@@ -34,8 +32,8 @@ class App extends Component {
 			socket.emit('command', 'jsonlist2', data => this.filter(data));
 
 	socket.on('value', data => this.listenchange(data));
-	
 	}
+	
 	
 	filter = (color) => {
 			var realmodel = [];
@@ -48,7 +46,7 @@ class App extends Component {
 				if(!/((new)|(fs20log)|(temp)|(telnet)|(WEB)|(autocreate)|(global)|(Logfile)|(initialUsb)|(eventTypes)|(CUL)|(FileLog)|(HM_)|(Action))/.test(jsobj.Results[i].Name)) {
 					realmodel.push(jsobj.Results[i]);
 				}
-			}
+			} 
 			
 		this.setState({ devices: realmodel })
 		console.log(realmodel);
@@ -84,17 +82,25 @@ class App extends Component {
   render() {
 	
 	const { devices } = this.state;
+	const { endpoint } = this.state;
 	
+	const tryit = <Automation devices = {devices} endpoint = {endpoint}/>
 	const listItem = this.state.devices.map((device, id) =>
   <li key={id}>
-  <div className="elements">
-	{device.Name} ----------------------------------- {device.Internals.STATE} ---- 
+		<div className="elements">
+<div className="status">
+	<h4>{device.Name}  {device.Internals.STATE}&nbsp;&nbsp; </h4>
+</div>
+<div className="button">
 	<label className="switch">
 	<input type="checkbox" onChange={this.test.bind(this, device.Name)}/>
 	<span className="slider round"></span>
 	</label>
-	<Content PossibleSets={device.PossibleSets} Name={device.Name}/>
-  </div>
+</div>
+<div className="slidecontainer">
+		<Content PossibleSets={device.PossibleSets} Name={device.Name} endpoint = {endpoint}/>
+</div>
+		</div>
   </li>
 	);
 	
@@ -103,13 +109,14 @@ class App extends Component {
 	<header>
 	<h1>FHEM Home <img src={logo} className="App-logo" alt="logo"/>  </h1>
 	</header>
-	  
+	
 	  <article>
 	  <ul>
-	  {listItem} 
+	  {listItem}
 	  </ul>
 	  </article>
-	  
+	  {tryit}
+	  <Linechart devices = {this.state.devices} endpoint = {this.state.endpoint} deviccc = {this.state.deviccc}/>
 	  <footer>FHEM home</footer>
 	  </div>
     );
@@ -119,20 +126,14 @@ class App extends Component {
 class Content extends React.Component {
 	constructor(props) {
 		super(props);
-		
-		this.state = {
-			isLoggedIn: false,
-			endpoint: "http://194.95.194.122:8086"
-		};
 	}
 	
 	handlerChange = (param, event) => {
-	const socket = socketIOClient(this.state.endpoint);
-	console.log(param + " and " + event.target.value);
+	const socket = socketIOClient(this.props.endpoint);
 	socket.emit('command', 'set ' + param + ' dim' + event.target.value + '%');
 	}
 	
-   render(props) {
+   render() {
 		let range;
 	
 	if (this.props.PossibleSets.includes('dim')) {
